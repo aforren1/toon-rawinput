@@ -4,18 +4,31 @@ from winconstants import (RI_MOUSE_LEFT_BUTTON_DOWN, RI_MOUSE_LEFT_BUTTON_UP,
                           RI_MOUSE_RIGHT_BUTTON_DOWN, RI_MOUSE_RIGHT_BUTTON_UP,
                           RI_MOUSE_MIDDLE_BUTTON_DOWN, RI_MOUSE_MIDDLE_BUTTON_UP,
                           WHEEL_DELTA)
-from rawdevice import RawWinDevice
+from rawdevice import RawWinDevice, list_devices
 
 class MouseState(ctypes.Structure):
     _fields_ = [('dx', LONG), ('dy', LONG), ('lb', SHORT), 
-                ('rb', SHORT), ('mb', SHORT), ('wheel', SHORT)]
+                ('rb', SHORT), ('mb', SHORT), ('wheel', SHORT),
+                ('id', SHORT)]
 
 class RawMouse(RawWinDevice):
     ctype = MouseState
     usage = 0x02
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        mice = list_devices('mouse')
+        self._handles = [x['handle'] for x in mice]
+
     def _device_specific(self):
         d = self.ctype()
+        hDev = self._rinput.header.hDevice
+        try:
+            _hidx = self._handles.index(hDev)
+        except ValueError:
+            _hidx = len(self._handles)
+            self._handles.append(hDev)
+        d.id = _hidx
         ms = self._rinput.data.mouse
         d.dx = ms.lLastX
         d.dy = ms.lLastY

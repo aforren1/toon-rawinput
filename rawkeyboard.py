@@ -1,8 +1,9 @@
 import ctypes
-from rawdevice import RawWinDevice
+from rawdevice import RawWinDevice, list_devices
+from wintypes import SHORT
 
 class Data(ctypes.Structure):
-    _fields_ = [('index', ctypes.c_uint16), ('press', ctypes.c_bool)]
+    _fields_ = [('index', ctypes.c_uint16), ('press', ctypes.c_bool), ('id', SHORT)]
 
 class RawKeyboard(RawWinDevice):
     ctype = Data
@@ -16,15 +17,23 @@ class RawKeyboard(RawWinDevice):
             for k, v in win_keys.items():
                 if v == refk:
                     self._vals.append(k)
+        kbs = list_devices('keyboard')
+        self._handles = [x['handle'] for x in kbs]
         super().__init__(**kwargs)
     
     def _device_specific(self):
         kb = self._rinput.data.keyboard
+        hDev = self._rinput.header.hDevice
+        try:
+            _hidx = self._handles.index(hDev)
+        except ValueError:
+            _hidx = len(self._handles)
+            self._handles.append(hDev)
         try:
             idx = self._vals.index(kb.VKey)
         except ValueError:
             return None
-        return self.ctype(index=idx, press=not kb.Flags)
+        return self.ctype(index=idx, press=not kb.Flags, id=_hidx)
 
 #https://github.com/Psychtoolbox-3/Psychtoolbox-3/blob/fab0b49fd38ec477e3b4573f23dbd7766b0a89aa/Psychtoolbox/PsychBasic/KbName.m       
 #https://github.com/psychopy/psychopy/blob/76b07c9aa1e14726f9edf631739ac3682a51d9da/psychopy/hardware/keyboard.py#L437

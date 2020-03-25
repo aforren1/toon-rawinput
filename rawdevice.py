@@ -6,7 +6,8 @@ from winconstants import (HWND_MESSAGE, RIDEV_NOLEGACY,
                           RIDEV_INPUTSINK, RID_INPUT,
                           RIDI_DEVICENAME, RIDI_DEVICEINFO,
                           RIDI_PREPARSEDDATA, RIM_TYPEHID,
-                          RIM_TYPEKEYBOARD, RIM_TYPEMOUSE)
+                          RIM_TYPEKEYBOARD, RIM_TYPEMOUSE,
+                          PM_REMOVE)
 import ctypes.wintypes as cwt
 
 kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
@@ -46,7 +47,7 @@ u32.GetRawInputDeviceList.argtypes = [PRAWINPUTDEVICELIST, PUINT, UINT]
 u32.GetRawInputDeviceInfoW.restype = UINT
 u32.GetRawInputDeviceInfoW.argtypes = [HANDLE, UINT, LPVOID, PUINT]
 
-def list_devices(dev_type=None):
+def list_devices(dev_type='all'):
     nDevices = UINT()
     sz = sizeof(RAWINPUTDEVICELIST)
     res = u32.GetRawInputDeviceList(None, byref(nDevices), sz)
@@ -73,7 +74,7 @@ def list_devices(dev_type=None):
                                         byref(devinfo), byref(sz))
         # num of bytes should be > 0
         if res2 > 0:
-            packet = {'name': tmpstr.value}
+            packet = {'name': tmpstr.value, 'handle': devs[i].hDevice}
             if devinfo.dwType == RIM_TYPEHID:
                 packet['info'] = devinfo.hid
                 hids.append(packet)
@@ -83,14 +84,14 @@ def list_devices(dev_type=None):
             else:
                 packet['info'] = devinfo.mouse
                 mice.append(packet)
-    
-    if dev_type is None:
-        return mice, keyboards, hids
-    if dev_type == RIM_TYPEHID:
+            
+    if dev_type == 'hid':
         return hids
-    if dev_type == RIM_TYPEKEYBOARD:
+    if dev_type == 'keyboard':
         return keyboards
-    return mice
+    if dev_type == 'mouse':
+        return mice
+    return mice, keyboards, hids
 
 
 class RawWinDevice(BaseDevice):
@@ -144,7 +145,18 @@ class RawWinDevice(BaseDevice):
             data = self._device_specific() # can get data from self._rinput
             if data is None:
                 return None
-            return time, data
+            res = [[time, data]]
+            # now spin until we're out of messages
+            while u32.PeekMessageW(byref(self._msg), 0, 0, 0, PM_REMOVE):
+                u32.TranslateMessage(byref(self._msg))
+                hRawInput = cast(self._msg.lParam, HRAWINPUT)
+                u32.GetRawInputData(hRawInput, RID_INPUT, byref(self._rinput), 
+                                    byref(self._rsize), sizeof(RAWINPUTHEADER))
+                
+                data = self._device_specific() # can get data from self._rinput
+                if data is not None:
+                    res.append([time, data])
+            return res
         return None
     
     def _device_specific(self):

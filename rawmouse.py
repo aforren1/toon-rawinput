@@ -12,7 +12,7 @@ class MouseState(ctypes.Structure):
 
 class RawMouse(RawWinDevice):
     ctype = MouseState
-    devtype = 0x02
+    usage = 0x02
 
     def _device_specific(self):
         d = self.ctype()

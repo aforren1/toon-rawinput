@@ -1,5 +1,4 @@
 import ctypes
-from array import array
 from rawdevice import RawWinDevice
 
 class Data(ctypes.Structure):
@@ -7,7 +6,7 @@ class Data(ctypes.Structure):
 
 class RawKeyboard(RawWinDevice):
     ctype = Data
-    devtype = 0x06
+    usage = 0x06
 
     def __init__(self, keys=['a', 's', 'd', 'f'], **kwargs):
         self.keys = keys

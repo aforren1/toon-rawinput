@@ -40,7 +40,8 @@ u32.DispatchMessageW.argtypes = [LPMSG]
 class RawWinDevice(BaseDevice):
     sampling_frequency = 100
     ctype = int # dummy (fill in later)
-    devtype = -1 # usage ID; so far, just 0x02 (mouse) or 0x06 (keyboard)
+    usage_page = 0x01
+    usage = -1 # usage ID; so far, just 0x02 (mouse) or 0x06 (keyboard)
 
     # do nothing in init
 
@@ -63,7 +64,7 @@ class RawWinDevice(BaseDevice):
         else:
             raise ValueError('Window creation failed.')
 
-        raw_dev = RAWINPUTDEVICE(0x01, self.devtype, RIDEV_NOLEGACY|RIDEV_INPUTSINK, hwnd)
+        raw_dev = RAWINPUTDEVICE(self.usage_page, self.usage, RIDEV_NOLEGACY|RIDEV_INPUTSINK, hwnd)
         if not u32.RegisterRawInputDevices(byref(raw_dev), 1, sizeof(RAWINPUTDEVICE)):
             self.exit()
             raise ValueError('Could not register raw device.')

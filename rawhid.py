@@ -12,3 +12,5 @@ class RawHID(RawWinDevice):
     def _device_specific(self):
         hd = self._rinput.data.hid
         data = hd.bRawData.contents
+
+# future note: Teensy usage page is 0xffab, usage is 0x0200

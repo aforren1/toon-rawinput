@@ -203,3 +203,52 @@ class RAWINPUT(Structure):
         ('header', RAWINPUTHEADER),
         ('data', _RAWINPUTDEVICEUNION),
     ]
+
+class RAWINPUTDEVICELIST(Structure):
+    _fields_ = [
+        ('hDevice', HANDLE),
+        ('dwType', DWORD)
+    ]
+
+PRAWINPUTDEVICELIST = POINTER(RAWINPUTDEVICELIST)
+
+class RID_DEVICE_INFO_MOUSE(Structure):
+    _fields_ = [
+        ('dwId', DWORD),
+        ('dwNumberOfButtons', DWORD),
+        ('fHasHorizontalWheel', BOOL)
+    ]
+
+class RID_DEVICE_INFO_KEYBOARD(Structure):
+    _fields_ = [
+        ('dwType', DWORD),
+        ('dwSubType', DWORD),
+        ('dwKeyboardMode', DWORD),
+        ('dwNumberOfFunctionKeys', DWORD),
+        ('dwNumberOfIndicators', DWORD),
+        ('dwNumberOfKeysTotal', DWORD)
+    ]
+
+class RID_DEVICE_INFO_HID(Structure):
+    _fields_ = [
+        ('dwVendorId', DWORD),
+        ('dwProductId', DWORD),
+        ('dwVersionNumber', DWORD),
+        ('usUsagePage', USHORT),
+        ('usUsage', USHORT)
+    ]
+
+class _UINFO(Union):
+    _fields_ = [
+        ('mouse', RID_DEVICE_INFO_MOUSE),
+        ('keyboard', RID_DEVICE_INFO_KEYBOARD),
+        ('hid', RID_DEVICE_INFO_HID)
+    ]
+
+class RID_DEVICE_INFO(Structure):
+    _anonymous_ = ('x',)
+    _fields_ = [
+        ('cbSize', DWORD),
+        ('dwType', DWORD),
+        ('x', _UINFO)
+    ]

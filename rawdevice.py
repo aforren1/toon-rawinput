@@ -3,11 +3,15 @@ from ctypes import windll
 from wintypes import *
 
 from winconstants import (HWND_MESSAGE, RIDEV_NOLEGACY,
-                          RIDEV_INPUTSINK, RID_INPUT)
+                          RIDEV_INPUTSINK, RID_INPUT,
+                          RIDI_DEVICENAME, RIDI_DEVICEINFO,
+                          RIDI_PREPARSEDDATA, RIM_TYPEHID,
+                          RIM_TYPEKEYBOARD, RIM_TYPEMOUSE)
 import ctypes.wintypes as cwt
 
 kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
 u32 = windll.user32
+k32 = windll.kernel32
 
 # https://github.com/pyglet/pyglet/blob/b49b6a7052fe21ad64e53456bc23c289a9ccb757/pyglet/libs/win32/__init__.py#L268
 u32.RegisterRawInputDevices.restype = BOOL
@@ -36,6 +40,58 @@ u32.TranslateMessage.restype = BOOL
 u32.TranslateMessage.argtypes = [LPMSG]
 u32.DispatchMessageW.restype = LRESULT
 u32.DispatchMessageW.argtypes = [LPMSG]
+
+u32.GetRawInputDeviceList.restype = UINT
+u32.GetRawInputDeviceList.argtypes = [PRAWINPUTDEVICELIST, PUINT, UINT]
+u32.GetRawInputDeviceInfoW.restype = UINT
+u32.GetRawInputDeviceInfoW.argtypes = [HANDLE, UINT, LPVOID, PUINT]
+
+def list_devices(dev_type=None):
+    nDevices = UINT()
+    sz = sizeof(RAWINPUTDEVICELIST)
+    res = u32.GetRawInputDeviceList(None, byref(nDevices), sz)
+    if res != 0:
+        raise ValueError('Something went wrong, error code: %i' % k32.GetLastError())
+    devs = (RAWINPUTDEVICELIST*nDevices.value)()
+    res = u32.GetRawInputDeviceList(ctypes.cast(devs, PRAWINPUTDEVICELIST), 
+                                    byref(nDevices), sz)
+    hids = []
+    keyboards = []
+    mice = []
+    for i in range(res):
+        devinfo = RID_DEVICE_INFO()
+        devinfo.cbSize = sizeof(RID_DEVICE_INFO)
+        sz = UINT(sizeof(devinfo))
+        
+        tmpstr = ctypes.create_unicode_buffer(100)
+        sz2 = UINT(sizeof(tmpstr))
+        
+        res2 = u32.GetRawInputDeviceInfoW(devs[i].hDevice, RIDI_DEVICENAME,
+                                        byref(tmpstr), sz2)
+        
+        res2 = u32.GetRawInputDeviceInfoW(devs[i].hDevice, RIDI_DEVICEINFO, 
+                                        byref(devinfo), byref(sz))
+        # num of bytes should be > 0
+        if res2 > 0:
+            packet = {'name': tmpstr.value}
+            if devinfo.dwType == RIM_TYPEHID:
+                packet['info'] = devinfo.hid
+                hids.append(packet)
+            elif devinfo.dwType == RIM_TYPEKEYBOARD:
+                packet['info'] = devinfo.keyboard
+                keyboards.append(packet)
+            else:
+                packet['info'] = devinfo.mouse
+                mice.append(packet)
+    
+    if dev_type is None:
+        return mice, keyboards, hids
+    if dev_type == RIM_TYPEHID:
+        return hids
+    if dev_type == RIM_TYPEKEYBOARD:
+        return keyboards
+    return mice
+
 
 class RawWinDevice(BaseDevice):
     sampling_frequency = 100

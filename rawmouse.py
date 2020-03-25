@@ -65,15 +65,18 @@ if __name__ == '__main__':
     from toon.input.mpdevice import MpDevice
     dev = MpDevice(RawMouse())
     times = []
+    datae = []
     with dev:
         start = time.time()
-        while time.time() - start < 20:
-            dat = dev.read()
-            if dat:
-                times.append(dat.time)
-                print(dat.data)  # access joints via dat[-1]['thumb']['mcp']
+        while time.time() - start < 10:
+            res = dev.read()
+            if res:
+                ti, data = res
+                times.append(ti)
+                datae.append(data)
+                print(data)  # access joints via dat[-1]['thumb']['mcp']
             #time.sleep(0.016)  # pretend to have a screen
-    
+
     import numpy as np
     import matplotlib.pyplot as plt
 

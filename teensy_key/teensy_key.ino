@@ -1,5 +1,5 @@
 
-
+// Make sure to set the USB type!
 
 int main (void) {
   pinMode(LED_BUILTIN, OUTPUT);

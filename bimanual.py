@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     with dev:
         t0 = default_timer()
-        t1 = t0 + 30
+        t1 = t0 + 60
         while t1 > default_timer():
             res = dev.read()
             if res:
@@ -24,9 +24,9 @@ if __name__ == '__main__':
                 left = data[data['id']==0]
                 right = data[data['id']==1]
                 if left.shape[0] > 0:
-                    cir.position.x += float(left[-1]['dy']) / win.height
+                    cir.position.x += float(sum(left['dy'])) / win.height
                 if right.shape[0] > 0:
-                    cir.position.y += float(right[-1]['dx'] / win.height)
+                    cir.position.y += float(sum(right['dx'])) / win.height
 
             cir.draw()
             win.flip()

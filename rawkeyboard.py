@@ -24,6 +24,7 @@ class RawKeyboard(RawWinDevice):
     def _device_specific(self):
         kb = self._rinput.data.keyboard
         hDev = self._rinput.header.hDevice
+        # (potentially) handle hot plugging
         try:
             _hidx = self._handles.index(hDev)
         except ValueError:
@@ -31,6 +32,7 @@ class RawKeyboard(RawWinDevice):
             self._handles.append(hDev)
         try:
             idx = self._vals.index(kb.VKey)
+        # key not in valid set
         except ValueError:
             return None
         return self.ctype(index=idx, press=not kb.Flags, id=_hidx)

@@ -23,6 +23,7 @@ class RawMouse(RawWinDevice):
     def _device_specific(self):
         d = self.ctype()
         hDev = self._rinput.header.hDevice
+        # (potentially) handle hot plugging
         try:
             _hidx = self._handles.index(hDev)
         except ValueError:
@@ -30,6 +31,7 @@ class RawMouse(RawWinDevice):
             self._handles.append(hDev)
         d.id = _hidx
         ms = self._rinput.data.mouse
+        # mouse dx/dy
         d.dx = ms.lLastX
         d.dy = ms.lLastY
         # left button up/down (0 if no state change)
@@ -74,8 +76,8 @@ if __name__ == '__main__':
                 ti, data = res
                 times.append(ti)
                 datae.append(data)
-                print(data)  # access joints via dat[-1]['thumb']['mcp']
-            #time.sleep(0.016)  # pretend to have a screen
+                print(data)
+            time.sleep(0.016)  # pretend to have a screen
 
     import numpy as np
     import matplotlib.pyplot as plt

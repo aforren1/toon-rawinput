@@ -94,17 +94,21 @@ class RawWinDevice(BaseDevice):
 
         self._hwnd = hwnd
         self._wndclass = wndclass
-        self._msgs = (MSG*10)()
+        self._msgs = (MSG*10)() # preallocate small number of MSGs for reuse
         self._rinput = RAWINPUT()
         self._rsize = UINT(sizeof(self._rinput))
     
     def read(self):
+        # block until the first message
         if u32.GetMessageW(byref(self._msgs[0]), 0, 0, 0):
-            time = self.clock()
+            time = self.clock() # take time ASAP
             counter = 1
+            # any other messages?
             while u32.PeekMessageW(byref(self._msgs[counter]), 0, 0, 0, PM_REMOVE):
                 counter += 1
             res = []
+            # retrieve the data from each message
+            # Note that we didn't need [Translate/Dispatch]Message
             for i in range(counter):
                 _msg = self._msgs[i]
                 hRawInput = cast(_msg.lParam, HRAWINPUT)

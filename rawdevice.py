@@ -10,42 +10,8 @@ from winconstants import (HWND_MESSAGE, RIDEV_NOLEGACY,
                           PM_REMOVE)
 import ctypes.wintypes as cwt
 
-kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
 u32 = windll.user32
 k32 = windll.kernel32
-
-# https://github.com/pyglet/pyglet/blob/b49b6a7052fe21ad64e53456bc23c289a9ccb757/pyglet/libs/win32/__init__.py#L268
-u32.RegisterRawInputDevices.restype = BOOL
-u32.RegisterRawInputDevices.argtypes = [PCRAWINPUTDEVICE, UINT, UINT]
-u32.GetRawInputData.restype = UINT
-u32.GetRawInputData.argtypes = [HRAWINPUT, UINT, LPVOID, PUINT, UINT]
-u32.ChangeWindowMessageFilterEx.restype = BOOL
-u32.ChangeWindowMessageFilterEx.argtypes = [HWND, UINT, DWORD, c_void_p]
-
-# https://github.com/pyglet/pyglet/blob/b49b6a7052fe21ad64e53456bc23c289a9ccb757/pyglet/libs/win32/__init__.py#L220
-u32.RegisterClassW.restype = ATOM
-u32.RegisterClassW.argtypes = [POINTER(WNDCLASS)]
-u32.CreateWindowExW.restype = HWND
-u32.CreateWindowExW.argtypes = [DWORD, c_wchar_p, c_wchar_p, DWORD, c_int, c_int, c_int, c_int, HWND, HMENU, HINSTANCE, LPVOID]
-u32.DefWindowProcW.restype = LRESULT
-u32.DefWindowProcW.argtypes = [HWND, UINT, WPARAM, LPARAM]
-u32.DestroyWindow.restype = BOOL
-u32.DestroyWindow.argtypes = [HWND]
-u32.UnregisterClassW.restype = BOOL
-u32.UnregisterClassW.argtypes = [c_wchar_p, HINSTANCE]
-u32.PeekMessageW.restype = BOOL
-u32.PeekMessageW.argtypes = [LPMSG, HWND, UINT, UINT, UINT]
-u32.GetMessageW.restype = BOOL
-u32.GetMessageW.argtypes = [LPMSG, HWND, UINT, UINT]
-u32.TranslateMessage.restype = BOOL
-u32.TranslateMessage.argtypes = [LPMSG]
-u32.DispatchMessageW.restype = LRESULT
-u32.DispatchMessageW.argtypes = [LPMSG]
-
-u32.GetRawInputDeviceList.restype = UINT
-u32.GetRawInputDeviceList.argtypes = [PRAWINPUTDEVICELIST, PUINT, UINT]
-u32.GetRawInputDeviceInfoW.restype = UINT
-u32.GetRawInputDeviceInfoW.argtypes = [HANDLE, UINT, LPVOID, PUINT]
 
 def list_devices(dev_type='all'):
     nDevices = UINT()
@@ -105,7 +71,7 @@ class RawWinDevice(BaseDevice):
     def enter(self):
         # make classname unique
         current_counter = cwt.LARGE_INTEGER()
-        kernel32.QueryPerformanceCounter(ctypes.byref(current_counter))
+        k32.QueryPerformanceCounter(ctypes.byref(current_counter))
         classname = 'RawWindow%s' % current_counter.value
 
         wndclass = WNDCLASS()

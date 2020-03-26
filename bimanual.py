@@ -12,11 +12,14 @@ if __name__ == '__main__':
     height = win.height
     cir = Circle(win, scale=0.1, fill_color = (0.2, 0.9, 0.7, 1))
 
+    cl = Circle(win, scale=0.025, fill_color = (1, 1, 1, 1))
+    cr = Circle(win, scale=0.025, fill_color = (0, 0, 0, 1))
+
     dev = MpDevice(RawMouse())
 
     with dev:
         t0 = default_timer()
-        t1 = t0 + 60
+        t1 = t0 + 30
         while t1 > default_timer():
             res = dev.read()
             if res:
@@ -25,8 +28,13 @@ if __name__ == '__main__':
                 right = data[data['id']==1]
                 if left.shape[0] > 0:
                     cir.position.x += float(sum(left['dy'])) / win.height
+                    cl.position.x += float(sum(left['dx'])) / win.height
+                    cl.position.y -= float(sum(left['dy'])) / win.height
                 if right.shape[0] > 0:
                     cir.position.y += float(sum(right['dx'])) / win.height
-
+                    cr.position.x += float(sum(right['dx'])) / win.height
+                    cr.position.y -= float(sum(right['dy'])) / win.height
             cir.draw()
+            cl.draw()
+            cr.draw()
             win.flip()

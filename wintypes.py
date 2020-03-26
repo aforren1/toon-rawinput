@@ -1,3 +1,4 @@
+# https://github.com/pyglet/pyglet/blob/b49b6a7052fe21ad64e53456bc23c289a9ccb757/pyglet/libs/win32/types.py
 # reduced wintypes, original copyright below:
 # ----------------------------------------------------------------------------
 # pyglet
@@ -204,6 +205,7 @@ class RAWINPUT(Structure):
         ('data', _RAWINPUTDEVICEUNION),
     ]
 
+# from here on are ADF's additions
 class RAWINPUTDEVICELIST(Structure):
     _fields_ = [
         ('hDevice', HANDLE),

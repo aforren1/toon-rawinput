@@ -128,35 +128,28 @@ class RawWinDevice(BaseDevice):
 
         self._hwnd = hwnd
         self._wndclass = wndclass
-        self._msg = MSG()
+        self._msgs = (MSG*10)()
         self._rinput = RAWINPUT()
         self._rsize = UINT(sizeof(self._rinput))
     
     def read(self):
-        # TODO: could do a better job with multiple simultaneous messages
-        # by switching to PeekMessage and spinning until all consumed
-        if u32.GetMessageW(byref(self._msg), 0, 0, 0):
+        if u32.GetMessageW(byref(self._msgs[0]), 0, 0, 0):
             time = self.clock()
-            u32.TranslateMessage(byref(self._msg))
-            hRawInput = cast(self._msg.lParam, HRAWINPUT)
-            u32.GetRawInputData(hRawInput, RID_INPUT, byref(self._rinput), 
-                                byref(self._rsize), sizeof(RAWINPUTHEADER))
-            
-            data = self._device_specific() # can get data from self._rinput
-            if data is None:
-                return None
-            res = [[time, data]]
-            # now spin until we're out of messages
-            while u32.PeekMessageW(byref(self._msg), 0, 0, 0, PM_REMOVE):
-                u32.TranslateMessage(byref(self._msg))
-                hRawInput = cast(self._msg.lParam, HRAWINPUT)
+            counter = 1
+            while u32.PeekMessageW(byref(self._msgs[counter]), 0, 0, 0, PM_REMOVE):
+                counter += 1
+            print(counter)
+            res = []
+            for i in range(counter):
+                _msg = self._msgs[i]
+                hRawInput = cast(_msg.lParam, HRAWINPUT)
                 u32.GetRawInputData(hRawInput, RID_INPUT, byref(self._rinput), 
                                     byref(self._rsize), sizeof(RAWINPUTHEADER))
-                
                 data = self._device_specific() # can get data from self._rinput
                 if data is not None:
                     res.append([time, data])
-            return res
+            if res:
+                return res
         return None
     
     def _device_specific(self):

@@ -138,7 +138,6 @@ class RawWinDevice(BaseDevice):
             counter = 1
             while u32.PeekMessageW(byref(self._msgs[counter]), 0, 0, 0, PM_REMOVE):
                 counter += 1
-            print(counter)
             res = []
             for i in range(counter):
                 _msg = self._msgs[i]

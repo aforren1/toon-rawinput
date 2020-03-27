@@ -107,8 +107,10 @@ class RawWinDevice(BaseDevice):
             time = self.clock() # take time ASAP
             counter = 1
             # any other messages?
-            while u32.PeekMessageW(byref(self._msgs[counter]), 0, 0, 0, PM_REMOVE):
-                counter += 1
+            #while u32.PeekMessageW(byref(self._msgs[counter]), 0, 0, 0, PM_REMOVE):
+            #    u32.TranslateMessage(byref(self._msgs[counter]))
+            #    u32.DispatchMessageW(byref(self._msgs[counter]))
+            #    counter += 1
             res = []
             # retrieve the data from each message
             # Note that we didn't need [Translate/Dispatch]Message

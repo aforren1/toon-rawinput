@@ -95,7 +95,7 @@ class RawWinDevice(BaseDevice):
         raw_dev = RAWINPUTDEVICE(self.usage_page, self.usage, flags, hwnd)
         if not u32.RegisterRawInputDevices(byref(raw_dev), 1, sizeof(RAWINPUTDEVICE)):
             self.exit()
-            raise ValueError('Could not register raw device. Error code: ' % k32.GetLastError())
+            raise ValueError('Could not register raw device. Error code: %s' % k32.GetLastError())
 
         self._msgs = (MSG*10)() # preallocate small number of MSGs for reuse
         self._rinput = RAWINPUT()

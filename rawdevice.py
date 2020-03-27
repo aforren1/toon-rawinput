@@ -86,14 +86,17 @@ class RawWinDevice(BaseDevice):
                                        None, wndclass.hInstance, None)
         else:
             raise ValueError('Window creation failed.')
-
-        raw_dev = RAWINPUTDEVICE(self.usage_page, self.usage, RIDEV_NOLEGACY|RIDEV_INPUTSINK, hwnd)
-        if not u32.RegisterRawInputDevices(byref(raw_dev), 1, sizeof(RAWINPUTDEVICE)):
-            self.exit()
-            raise ValueError('Could not register raw device.')
-
         self._hwnd = hwnd
         self._wndclass = wndclass
+        flags = RIDEV_INPUTSINK
+        # NOLEGACY makes raw HID unhappy
+        if self.usage_page == 0x01 and self.usage in [0x02, 0x06]:
+            flags = flags | RIDEV_NOLEGACY
+        raw_dev = RAWINPUTDEVICE(self.usage_page, self.usage, flags, hwnd)
+        if not u32.RegisterRawInputDevices(byref(raw_dev), 1, sizeof(RAWINPUTDEVICE)):
+            self.exit()
+            raise ValueError('Could not register raw device. Error code: ' % k32.GetLastError())
+
         self._msgs = (MSG*10)() # preallocate small number of MSGs for reuse
         self._rinput = RAWINPUT()
         self._rsize = UINT(sizeof(self._rinput))

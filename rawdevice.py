@@ -76,11 +76,11 @@ class RawWinDevice(BaseDevice):
 
         wndclass = WNDCLASS()
         wndclass.lpszClassName = classname
-        wndclass.cbSize = sizeof(wndclass)
+        # wndclass.cbSize = sizeof(WNDCLASS)
         wndclass.lpfnWndProc = WNDPROC(u32.DefWindowProcW)
         wndclass.hInstance = 0
 
-        if u32.RegisterClassW(wndclass):
+        if u32.RegisterClassW(byref(wndclass)):
             hwnd = u32.CreateWindowExW(0, wndclass.lpszClassName, '', 
                                        0, 0, 0, 0, 0, HWND_MESSAGE, 
                                        None, wndclass.hInstance, None)
@@ -107,10 +107,10 @@ class RawWinDevice(BaseDevice):
             time = self.clock() # take time ASAP
             counter = 1
             # any other messages?
-            #while u32.PeekMessageW(byref(self._msgs[counter]), 0, 0, 0, PM_REMOVE):
+            # while u32.PeekMessageW(byref(self._msgs[counter]), 0, 0, 0, PM_REMOVE):
             #    u32.TranslateMessage(byref(self._msgs[counter]))
             #    u32.DispatchMessageW(byref(self._msgs[counter]))
-            #    counter += 1
+            #     counter += 1
             res = []
             # retrieve the data from each message
             # Note that we didn't need [Translate/Dispatch]Message

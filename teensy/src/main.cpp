@@ -7,7 +7,7 @@ int main (void) {
   elapsedMicros t1;
   t0 = 0;
   t1 = 0;
-  constexpr uint32_t press_period = 250000; // press every 250ms
+  constexpr uint32_t press_period = 200000; // press every 200ms
   constexpr uint32_t hold_time = 50000; // hold 50ms
   while(1) {
     while(t0 < press_period) {}
@@ -37,7 +37,7 @@ int main(void)
       // busy wait until next move time
       while(t0 < move_period) {}
       t0 = 0;
-      Mouse.move(1 * sign, 1 * sign);
+      Mouse.move(sign, sign);
       sign = sign * -1;
       counter += 1;
       if (counter >= 100)

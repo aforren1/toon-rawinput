@@ -1,8 +1,8 @@
 from toon.input import BaseDevice
 from ctypes import windll
-from wintypes import *
+from .wintypes import *
 
-from winconstants import (HWND_MESSAGE, RIDEV_NOLEGACY,
+from .winconstants import (HWND_MESSAGE, RIDEV_NOLEGACY,
                           RIDEV_INPUTSINK, RID_INPUT,
                           RIDI_DEVICENAME, RIDI_DEVICEINFO,
                           RIDI_PREPARSEDDATA, RIM_TYPEHID,
@@ -60,7 +60,7 @@ def list_devices(dev_type='all'):
     return mice, keyboards, hids
 
 
-class RawWinDevice(BaseDevice):
+class RawInput(BaseDevice):
     sampling_frequency = 100
     ctype = int # dummy (fill in later)
     usage_page = 0x01

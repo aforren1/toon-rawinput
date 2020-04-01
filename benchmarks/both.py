@@ -5,13 +5,13 @@ print(ptb.GetSecs())
 
 if __name__ == '__main__':
     from toon.input import MpDevice
-    from rawkeyboard import RawKeyboard
-    from rawmouse import RawMouse
+    from toon_rawinput.keyboard import Keyboard
+    from toon_rawinput.mouse import Mouse
 
     print('sleeping-- plug in test device.')
     sleep(5)
     print('done sleeping-- good luck')
-    mydev = MpDevice(RawKeyboard(clock=ptb.GetSecs))
+    mydev = MpDevice(Keyboard(clock=ptb.GetSecs))
     hid = ptb.PsychHID
     devs = hid('Devices')
 

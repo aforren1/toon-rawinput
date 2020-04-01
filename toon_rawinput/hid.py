@@ -1,4 +1,4 @@
-from rawdevice import RawWinDevice, list_devices
+from .rawinput import RawInput, list_devices
 import ctypes
 import struct
 
@@ -7,7 +7,7 @@ import struct
 # packet
 # we should try to tell ahead of time how big the packet will be
 # 65451/512 or 65481/4
-class RawHID(RawWinDevice):
+class HID(RawInput):
     ctype = ctypes.c_ubyte
     shape = (64,)
     usage_page = 65451
@@ -30,7 +30,7 @@ class RawHID(RawWinDevice):
 if __name__ == '__main__':
     import time
     from toon.input.mpdevice import MpDevice
-    dev = MpDevice(RawHID())
+    dev = MpDevice(HID())
     with dev:
         start = time.time()
         while time.time() - start < 20:

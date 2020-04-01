@@ -1,11 +1,11 @@
 import ctypes
-from rawdevice import RawWinDevice, list_devices
-from wintypes import SHORT
+from .rawinput import RawInput, list_devices
+from .wintypes import SHORT
 
 class Data(ctypes.Structure):
     _fields_ = [('index', ctypes.c_uint16), ('press', ctypes.c_bool), ('id', SHORT)]
 
-class RawKeyboard(RawWinDevice):
+class Keyboard(RawInput):
     ctype = Data
     usage = 0x06
 
@@ -71,7 +71,7 @@ win_keys = {
 if __name__ == '__main__':
     import time
     from toon.input.mpdevice import MpDevice
-    dev = MpDevice(RawKeyboard())
+    dev = MpDevice(Keyboard())
     with dev:
         start = time.time()
         while time.time() - start < 20:

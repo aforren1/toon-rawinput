@@ -1,11 +1,11 @@
 if __name__ == '__main__':
     import time
     from toon.input.mpdevice import MpDevice
-    from rawkeyboard import RawKeyboard
-    from rawmouse import RawMouse
+    from toon_rawinput.keyboard import Keyboard
+    from toon_rawinput.mouse import Mouse
 
-    dev1 = MpDevice(RawMouse())
-    dev2 = MpDevice(RawKeyboard())
+    dev1 = MpDevice(Mouse())
+    dev2 = MpDevice(Keyboard())
     t1 = []
     t2 = []
     with dev1, dev2:

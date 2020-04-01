@@ -1,17 +1,17 @@
 import ctypes
-from wintypes import LONG, SHORT
-from winconstants import (RI_MOUSE_LEFT_BUTTON_DOWN, RI_MOUSE_LEFT_BUTTON_UP,
+from .wintypes import LONG, SHORT
+from .winconstants import (RI_MOUSE_LEFT_BUTTON_DOWN, RI_MOUSE_LEFT_BUTTON_UP,
                           RI_MOUSE_RIGHT_BUTTON_DOWN, RI_MOUSE_RIGHT_BUTTON_UP,
                           RI_MOUSE_MIDDLE_BUTTON_DOWN, RI_MOUSE_MIDDLE_BUTTON_UP,
                           WHEEL_DELTA)
-from rawdevice import RawWinDevice, list_devices
+from .rawinput import RawInput, list_devices
 
 class MouseState(ctypes.Structure):
     _fields_ = [('dx', LONG), ('dy', LONG), ('lb', SHORT), 
                 ('rb', SHORT), ('mb', SHORT), ('wheel', SHORT),
                 ('id', SHORT)]
 
-class RawMouse(RawWinDevice):
+class Mouse(RawInput):
     ctype = MouseState
     usage = 0x02
 
@@ -65,7 +65,7 @@ class RawMouse(RawWinDevice):
 if __name__ == '__main__':
     import time
     from toon.input.mpdevice import MpDevice
-    dev = MpDevice(RawMouse())
+    dev = MpDevice(Mouse())
     times = []
     datae = []
     with dev:

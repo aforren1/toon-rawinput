@@ -1,13 +1,7 @@
 #https://docs.microsoft.com/en-us/windows/win32/inputdev/using-raw-input
 from ctypes import windll
-from wintypes import *
-from winconstants import (HWND_MESSAGE, RIDEV_NOLEGACY, PM_REMOVE, 
-                          RIDEV_INPUTSINK, WM_INPUT, RID_INPUT,
-                          RIM_TYPEMOUSE, RIM_TYPEKEYBOARD, MOUSE_MOVE_RELATIVE,
-                          RI_MOUSE_LEFT_BUTTON_DOWN, RI_MOUSE_RIGHT_BUTTON_DOWN,
-                          RI_MOUSE_MIDDLE_BUTTON_DOWN, WHEEL_DELTA,
-                          RI_MOUSE_LEFT_BUTTON_UP, RI_MOUSE_RIGHT_BUTTON_UP,
-                          RI_MOUSE_MIDDLE_BUTTON_UP)
+from toon_rawinput.wintypes import *
+from toon_rawinput.winconstants import *
 import sys
 from timeit import default_timer
 u32 = windll.user32

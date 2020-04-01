@@ -2,7 +2,7 @@ from mglg.graphics.shape2d import Circle
 
 from mglg.graphics.win import Win
 
-from rawmouse import RawMouse
+from toon_rawinput.mouse import Mouse
 from toon.input import MpDevice
 from timeit import default_timer
 
@@ -15,7 +15,7 @@ if __name__ == '__main__':
     cl = Circle(win, scale=0.025, fill_color = (1, 1, 1, 1))
     cr = Circle(win, scale=0.025, fill_color = (0, 0, 0, 1))
 
-    dev = MpDevice(RawMouse())
+    dev = MpDevice(Mouse())
 
     with dev:
         t0 = default_timer()

@@ -2,3 +2,4 @@ __pycache__
 .pio/
 .vscode/
 *.egg-info/
+*.iohpid

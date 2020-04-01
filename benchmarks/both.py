@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     ptbtimes = []
     mytimes = []
-    total_time = 60 * 2
+    total_time = 60 * 1
     with mydev:
         t0 = time()
         hid('KbQueueFlush', idx)
@@ -48,30 +48,28 @@ if __name__ == '__main__':
     mytimes = np.hstack(mytimes)
     mylen = len(mytimes)
 
-    if mylen % 2 != 0:
-        mytimes = mytimes[1:]
-
     ptbtimes = np.array(ptbtimes)
     ptblen = len(ptbtimes)
-
-    if ptblen % 2 != 0:
-        ptbtimes = ptbtimes[1:]
-
-    print('mylen: %s, ptblen: %s' % (mylen, ptblen))
 
     if mylen < ptblen:
         ptbtimes = ptbtimes[-mylen:]
 
+    if mylen % 2 != 0:
+        mytimes = mytimes[1:]
+        ptbtimes = ptbtimes[1:]
+
+    print('mylen: %s, ptblen: %s' % (mylen, ptblen))
+
     mydff = np.diff(mytimes[::2])
     ptbdff = np.diff(ptbtimes[::2])
-    plt.plot(mydff, color='b', alpha=0.8)
     plt.plot(ptbdff, color='r', alpha=0.8)
+    plt.plot(mydff, color='b', alpha=0.8)
     plt.show()
     print('Press period consistency:')
     print('mymean: %f, mysd: %f, ptbmean: %f, ptbsd: %f' % (np.mean(mydff), np.std(mydff),
                                                             np.mean(ptbdff), np.std(ptbdff)))
+    plt.hist(ptbdff, bins=25, alpha=0.5, color='r')    
     plt.hist(mydff, bins=25, alpha=0.5, color='b')
-    plt.hist(ptbdff, bins=25, alpha=0.5, color='r')
     plt.show()
 
     # earlier/later? negative = ptb later, pos = mine later
@@ -85,8 +83,8 @@ if __name__ == '__main__':
     print('Press/release consistency:')
     print('mymean: %f, mysd: %f, ptbmean: %f, ptbsd: %f' % (np.mean(mytmp), np.std(mytmp),
                                                             np.mean(ptbtmp), np.std(ptbtmp)))
-    plt.hist(mytmp, bins=30, alpha=0.5, color='b')
     plt.hist(ptbtmp, bins=30, alpha=0.5, color='r')
+    plt.hist(mytmp, bins=30, alpha=0.5, color='b')
 
     plt.show()
 

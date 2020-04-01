@@ -10,7 +10,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 setup(
     name='toon_rawinput',
     version='0.0.1',
-    description='Tools for neuroscience experiments',
+    description='Tests for Raw Input devices via toon (Windows)',
     long_description=desc,
     long_description_content_type='text/markdown',
     url='https://github.com/aforren1/toon',

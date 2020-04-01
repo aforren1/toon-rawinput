@@ -38,6 +38,7 @@ int main(void)
       while(t0 < move_period) {}
       t0 = 0;
       Mouse.move(1 * sign, 1 * sign);
+      sign = sign * -1;
       counter += 1;
       if (counter >= 100)
       {

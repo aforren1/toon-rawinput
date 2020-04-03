@@ -76,7 +76,6 @@ class RawInput(BaseDevice):
 
         wndclass = WNDCLASS()
         wndclass.lpszClassName = classname
-        # wndclass.cbSize = sizeof(WNDCLASS)
         wndclass.lpfnWndProc = WNDPROC(u32.DefWindowProcW)
         wndclass.hInstance = 0
 
@@ -97,33 +96,31 @@ class RawInput(BaseDevice):
             self.exit()
             raise ValueError('Could not register raw device. Error code: %s' % k32.GetLastError())
 
-        self._msgs = (MSG*10)() # preallocate small number of MSGs for reuse
+        self._msg = MSG() # preallocate small number of MSGs for reuse
         self._rinput = RAWINPUT()
         self._rsize = UINT(sizeof(self._rinput))
     
     def read(self):
         # block until the first message
-        if u32.GetMessageW(byref(self._msgs[0]), 0, 0, 0):
+        val = u32.GetMessageW(byref(self._msg), 0, 0, 0)
+        time = self.clock()
+        if val > 0:
             time = self.clock() # take time ASAP
-            counter = 1
+            # counter = 1
             # any other messages?
             # while u32.PeekMessageW(byref(self._msgs[counter]), 0, 0, 0, PM_REMOVE):
-            #    u32.TranslateMessage(byref(self._msgs[counter]))
-            #    u32.DispatchMessageW(byref(self._msgs[counter]))
             #     counter += 1
-            res = []
+            # res = []
             # retrieve the data from each message
             # Note that we didn't need [Translate/Dispatch]Message
-            for i in range(counter):
-                _msg = self._msgs[i]
-                hRawInput = cast(_msg.lParam, HRAWINPUT)
-                u32.GetRawInputData(hRawInput, RID_INPUT, byref(self._rinput), 
-                                    byref(self._rsize), sizeof(RAWINPUTHEADER))
-                data = self._device_specific() # can get data from self._rinput
-                if data is not None:
-                    res.append([time, data])
-            if res:
-                return res
+            #for i in range(counter):
+            _msg = self._msg
+            hRawInput = cast(_msg.lParam, HRAWINPUT)
+            u32.GetRawInputData(hRawInput, RID_INPUT, byref(self._rinput),
+                                byref(self._rsize), sizeof(RAWINPUTHEADER))
+            data = self._device_specific() # can get data from self._rinput
+            if data is not None:
+                return time, data
         return None
     
     def _device_specific(self):

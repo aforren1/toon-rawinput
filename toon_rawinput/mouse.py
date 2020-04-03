@@ -76,12 +76,17 @@ if __name__ == '__main__':
                 ti, data = res
                 times.append(ti)
                 datae.append(data)
-                print(data)
+                #print(data)
             time.sleep(0.016)  # pretend to have a screen
 
     import numpy as np
     import matplotlib.pyplot as plt
 
-    x = np.diff(np.hstack(times))
-    plt.plot(x)
+    x = np.hstack(times)
+    y = np.hstack(datae)
+    # commented out things to sanity check dual input
+    #dff = y['id']
+    # plt.plot(np.diff(x[1::2]))
+    # plt.plot(np.diff(x[::2]))
+    plt.plot(np.diff(x))
     plt.show()
